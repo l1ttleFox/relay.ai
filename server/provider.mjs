@@ -20,6 +20,15 @@ export function createProvider({ origin = process.env.CVC_ORIGIN || 'https://ru.
   };
 }
 
+export function createInstructionProxy({ origin = process.env.CVC_ORIGIN || 'https://ru.cheapvibecode.ru', fetchImpl = fetch } = {}) {
+  const base = new URL(origin);
+  if (!['https://ru.cheapvibecode.ru', 'https://cheapvibecode.ru'].includes(base.origin)) throw new Error('Недопустимый CVC_ORIGIN');
+  return async (path, signal, headers = {}) => fetchImpl(new URL(path, base), {
+    method: 'GET', headers: { Accept: '*/*', ...headers }, redirect: 'error',
+    signal: AbortSignal.any([signal, AbortSignal.timeout(15000)]),
+  });
+}
+
 export async function readProvider(request, path, key, signal) {
   const response = await request(path, key, { signal });
   if (!response.ok) {

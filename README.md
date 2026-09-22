@@ -1,8 +1,8 @@
 # Relay AI — MVP кабинета покупателей
 
 Кабинет показывает доступный остаток токенов по купленному ключу и инструкции
-подключения к [CheapVibeCode](https://cheapvibecode.ru/ref/PJYJ6AJPD8).
-Клиенты моделей работают **напрямую** с провайдером.
+подключения. Служебные запросы и инструкции проходят через этот backend, а AI-запросы
+остаются **напрямую** у upstream-провайдера.
 
 ## Запуск
 
@@ -15,13 +15,14 @@ npm run server
 npm run dev
 ```
 
-Получить ключ для подключения можно через [CheapVibeCode](https://cheapvibecode.ru/ref/PJYJ6AJPD8).
+API-ключ покупателя передаётся в интерфейс и не сохраняется сервером.
 
 `.env`:
 
 ```env
 PORT=3000
 CVC_ORIGIN=https://ru.cheapvibecode.ru
+PUBLIC_ORIGIN=https://relay-ai-ami6.onrender.com
 ```
 
 API-ключи и cookies владельца в `.env` не нужны. Старые `PUBLIC_BASE_URL`,
@@ -59,28 +60,32 @@ Authorization: Bearer <ключ покупателя>
 
 ### `GET /api/instructions`
 
-Публичный ответ: `source`, `sourceUrl`, `sourceAsset`, `version`, `autoSynced`,
-`baseUrl`, `directBaseUrl`, `connectionMode`, `endpoints`, `environment`, `guides`.
+Публичный ответ: `source`, `version`, `autoSynced`, `baseUrl`, `directBaseUrl`,
+`connectionMode`, `endpoints`, `environment`, `guides`.
 
-Локальный снимок команд установки из **CheapVibeCode Docs**, проверенный 12.09.2026.
+Локальный снимок команд установки из документации upstream, проверенный 12.09.2026.
 Предоставлены Codex App/CLI/VS Code, Claude Code/App, OpenCode, Cursor, Gemini CLI,
 Kimi Code, DeepSeek Harness, Pi, Hermes, Grok Build, Cheap Code.
-Команды содержат placeholder `YOUR_API_KEY`, ссылки на оригинальные установщики
-и варианты Windows/macOS/Linux, где они присутствуют у провайдера. Скрипты на
-нашем backend не исполняются. Автоматического обновления снимка нет.
+Команды содержат placeholder `YOUR_API_KEY`, используют прокси-маршруты этого
+backend и поддерживают варианты Windows/macOS/Linux, где они присутствуют у upstream.
+Скрипты на нашем backend не исполняются. Автоматического обновления снимка нет.
 
 Python, JavaScript, curl и общие инструкции совместимых клиентов дополнены локально
 и имеют `source: local-example`; перенесённые инструкции — `source: provider-docs`.
 Статус `documented` означает наличие команды в Docs, а не тест установки каждого
 клиента. Это снимок основных команд, не полная копия всех вкладок ручной настройки.
 
-Клиентам указывается `https://ru.cheapvibecode.ru/v1` для OpenAI-compatible API;
-Codex и другие специальные клиенты получают свои настройки установщиком провайдера.
+Для служебных запросов инструкции используют `/api/account` и `/api/models` этого
+backend. AI-клиентам по-прежнему указывается `https://ru.cheapvibecode.ru/v1`;
+Codex и другие специальные клиенты получают настройки через локально проксированные
+установщики.
 
 ## Границы MVP
 
 История и фоновая синхронизация dashboard отложены. `/api/history` и все `/v1/*`
-на нашем backend возвращают 404. Сервер не принимает и не пересылает генерации.
+AI-маршруты на нашем backend возвращают 404. Сервер не принимает и не пересылает
+генерации; только инструкции и установочные скрипты проксируются с сохранением их
+исходного содержимого.
 Гипотеза сопоставления истории по расходам записана в `IMPLEMENTATION_PLAN.md`.
 
 ## Проверки

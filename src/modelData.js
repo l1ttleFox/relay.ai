@@ -1,6 +1,6 @@
 // Snapshot of provider model data: token multipliers, modalities and 24 h uptime.
-// Sources: https://cheapvibecode.ru/api/portal/pricing and /api/portal/model-uptime
-// (captured 2026-09-12). Both live endpoints require the owner session, so buyers
+// Sources are an owner-only pricing and uptime snapshot captured 2026-09-12.
+// Both live endpoints require the owner session, so buyers
 // see this dated copy. multiplier = tokens charged per unit of work relative to x1.
 export const snapshotAsOf = '2026-09-12';
 

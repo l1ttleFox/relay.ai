@@ -6,8 +6,10 @@ import { createProvider } from './provider.mjs';
 
 const headers = key => ({ Authorization: `Bearer ${key}` });
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
-async function setup(t, fetchImpl) {
-  const app = createApp({ request: createProvider({ fetchImpl }) });
+async function setup(t, fetchImpl, instructionFetchImpl) {
+  const request = createProvider({ fetchImpl });
+  if (instructionFetchImpl) request.instruction = (...args) => instructionFetchImpl(...args);
+  const app = createApp({ request });
   app.listen(0, '127.0.0.1'); await once(app, 'listening');
   t.after(async () => { app.closeAllConnections(); await new Promise(resolve => app.close(resolve)); });
   return `http://127.0.0.1:${app.address().port}`;
@@ -73,6 +75,18 @@ test('generation and history routes cannot invoke upstream', async t => {
   assert.equal(r.status, 405); assert.equal(r.headers.get('allow'), 'GET');
 });
 
+test('documented installer routes are served through this backend', async t => {
+  const base = await setup(t, async () => assert.fail('AI data endpoint must not be called'), async (url, signal, options) => {
+    assert.equal(new URL(url, 'https://relay-ai-ami6.onrender.com').pathname, '/icw');
+    assert.equal(options.Authorization, 'Bearer key-a');
+    return new Response("iex(irm 'https://ru.cheapvibecode.ru/icm'); Invoke-RestMethod 'https://ru.cheapvibecode.ru/v1/models'", { headers: { 'Content-Type': 'text/plain' } });
+  });
+  const response = await fetch(base + '/icw', { headers: headers('key-a') });
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), "iex(irm 'https://relay-ai-ami6.onrender.com/icm'); Invoke-RestMethod 'https://ru.cheapvibecode.ru/v1/models'");
+  assert.equal((await fetch(base + '/v1/chat/completions')).status, 404);
+});
+
 test('upstream errors are mapped without exposing upstream bodies', async t => {
   let status = 401;
   const base = await setup(t, async () => {
@@ -104,17 +118,24 @@ test('catalog reads only models with buyer authorization', async t => {
   assert.deepEqual(await r.json(), { data: [{ id: 'example-model' }] });
 });
 
-test('instructions mirror documented installer variants and point directly to provider', async t => {
+test('instructions are hosted locally while AI endpoints remain direct', async t => {
   const base = await setup(t, async () => assert.fail('public instructions must not contact upstream'));
   const r = await fetch(base + '/api/instructions');
   const data = await r.json();
   assert.equal(data.connectionMode, 'direct');
   assert.equal(data.baseUrl, 'https://ru.cheapvibecode.ru/v1');
   assert.equal(data.autoSynced, false);
+  assert.equal(data.sourceUrl, undefined);
+  assert.equal(data.sourceAsset, undefined);
   assert.equal(new Set(data.guides.map(g => g.id)).size, data.guides.length);
   for (const guide of data.guides) for (const example of guide.examples) {
     assert.equal(example.code.includes('localhost'), false);
-    if (example.scriptUrl) assert.equal(new URL(example.scriptUrl).origin, 'https://ru.cheapvibecode.ru');
+    if (example.scriptUrl) assert.equal(new URL(example.scriptUrl).origin, 'https://relay-ai-ami6.onrender.com');
+    if (guide.id === 'curl' || guide.id === 'python' || guide.id === 'javascript') {
+      assert.equal(example.code.includes('https://ru.cheapvibecode.ru/v1/models'), false);
+    } else {
+      assert.equal(example.code.includes('cheapvibecode.ru'), false);
+    }
   }
   const get = id => data.guides.find(g => g.id === id);
   assert.deepEqual(get('codex').os, ['Windows', 'macOS']);
@@ -125,6 +146,9 @@ test('instructions mirror documented installer variants and point directly to pr
   assert.equal(get('opencode').modelFormat, 'cheapvibecode/MODEL_ID');
   assert.equal(get('python').source, 'local-example');
   assert.ok(get('python').examples[0].code.includes('base_url="https://ru.cheapvibecode.ru/v1"'));
+  assert.equal(data.endpoints.models, 'https://relay-ai-ami6.onrender.com/api/models');
+  assert.equal(data.endpoints.balance, 'https://relay-ai-ami6.onrender.com/api/account');
+  assert.equal(data.endpoints.chat, 'https://ru.cheapvibecode.ru/v1/chat/completions');
 });
 
 test('adapter refuses unsupported routes and origins', async () => {
