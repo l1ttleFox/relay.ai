@@ -11,9 +11,16 @@ const allowedOrigins = new Set([
   'https://l1ttlefox.github.io',
 ]);
 
+// Rewrite only links to the proxied instruction scripts themselves. Direct API
+// URLs (/v1, /backend-api) and bare API roots must keep pointing at the
+// upstream: generation traffic is direct by design (connectionMode: 'direct'),
+// and this backend intentionally does not serve those routes.
 function proxyInstructionLinks(body, publicOrigin) {
   const publicRoot = publicOrigin.replace(/\/$/, '');
-  return body.replace(/https:\/\/(?:ru\.)?cheapvibecode\.ru(?!\/v1(?:[/?]|$)|\/backend-api(?:[/?]|$))/g, publicRoot);
+  return body.replace(/https:\/\/(?:ru\.)?cheapvibecode\.ru(\/[^\s"'`)\]<>]*)?/g, (match, tail = '') => {
+    const pathname = tail.split(/[?#]/)[0];
+    return instructionProxyPaths.has(pathname) ? publicRoot + tail : match;
+  });
 }
 
 export function createApp({ request }) {

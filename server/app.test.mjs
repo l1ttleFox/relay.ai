@@ -87,6 +87,38 @@ test('documented installer routes are served through this backend', async t => {
   assert.equal((await fetch(base + '/v1/chat/completions')).status, 404);
 });
 
+test('installer scripts keep direct API URLs on the provider host', async t => {
+  const script = [
+    `$ApiRoot = "https://ru.cheapvibecode.ru"`,
+    `$ModelsUrl = "https://ru.cheapvibecode.ru/v1/models"`,
+    `Invoke-RestMethod -Uri 'https://ru.cheapvibecode.ru/backend-api/codex/models'`,
+    `OPENAI_BASE_URL=https://ru.cheapvibecode.ru/v1`,
+    `base_url = "https://ru.cheapvibecode.ru/backend-api/codex"`,
+    `$ConfigUrl = "https://ru.cheapvibecode.ru/downloads/opencode.jsonc"`,
+    `iex(irm 'https://ru.cheapvibecode.ru/uc?shell=powershell')`,
+  ].join('\n');
+  let upstreamPath;
+  const base = await setup(t, async () => assert.fail('AI data endpoint must not be called'), async (url) => {
+    upstreamPath = url;
+    return new Response(script, { headers: { 'Content-Type': 'text/plain' } });
+  });
+  const rewritten = await (await fetch(base + '/iow', { headers: headers('key-a') })).text();
+  assert.equal(upstreamPath, '/iow');
+  assert.equal(rewritten, [
+    `$ApiRoot = "https://ru.cheapvibecode.ru"`,
+    `$ModelsUrl = "https://ru.cheapvibecode.ru/v1/models"`,
+    `Invoke-RestMethod -Uri 'https://ru.cheapvibecode.ru/backend-api/codex/models'`,
+    `OPENAI_BASE_URL=https://ru.cheapvibecode.ru/v1`,
+    `base_url = "https://ru.cheapvibecode.ru/backend-api/codex"`,
+    `$ConfigUrl = "https://relay-ai-ami6.onrender.com/downloads/opencode.jsonc"`,
+    `iex(irm 'https://relay-ai-ami6.onrender.com/uc?shell=powershell')`,
+  ].join('\n'));
+
+  // The query string must be preserved when proxying to the upstream.
+  await fetch(base + '/uc?shell=powershell', { headers: headers('key-a') });
+  assert.equal(upstreamPath, '/uc?shell=powershell');
+});
+
 test('upstream errors are mapped without exposing upstream bodies', async t => {
   let status = 401;
   const base = await setup(t, async () => {
