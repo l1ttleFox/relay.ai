@@ -53,6 +53,33 @@ function UptimeBadge({ value }) {
   </span>;
 }
 
+function formatTokens(value) {
+  return new Intl.NumberFormat('ru-RU').format(value);
+}
+
+function MediaPricing({ pricing }) {
+  if (!pricing) return null;
+  if (pricing.kind === 'video') return <div className="detail-cell detail-wide media-pricing">
+    <span className="mono-label">Списание · за секунду</span>
+    <div className="media-price-list">
+      {pricing.rates.map(([label, value]) => <div className="media-price-row" key={label}>
+        <span>{label}</span><b>{formatTokens(value)} токенов</b>
+      </div>)}
+    </div>
+    {pricing.note && <span className="media-price-note">{pricing.note}</span>}
+  </div>;
+  return <div className="detail-cell detail-wide media-pricing">
+    <span className="mono-label">Списание · за изображение</span>
+    <div className="media-price-list">
+      {pricing.tiers.map(([label, value]) => <div className="media-price-row" key={label}>
+        <span>{label}</span><b>{formatTokens(value)} токенов</b>
+      </div>)}
+    </div>
+    <span className="media-price-note">Количество: {pricing.counts.join(', ')}. Итоговая стоимость умножается на количество изображений.</span>
+    {pricing.note && <span className="media-price-note">{pricing.note}</span>}
+  </div>;
+}
+
 /* ---------------- Баланс ---------------- */
 export function BalanceView({ apiKey, accountResource, onOpenKeyDialog, onGoInstructions }) {
   const resource = accountResource;
@@ -150,6 +177,7 @@ function ModelDialog({ model, onClose }) {
       {!info && <p className="detail-missing">{t('detail.notInSnapshot')}</p>}
 
       {info && <div className="detail-grid">
+        <MediaPricing pricing={info.mediaPricing} />
         {info.multiplier != null && <div className="detail-cell">
           <span className="mono-label">{t('detail.multiplier')}</span>
           <MultiplierBadge value={info.multiplier} big />
