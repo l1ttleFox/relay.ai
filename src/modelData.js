@@ -1,14 +1,15 @@
 // Snapshot of provider model data: token multipliers, modalities and 24 h uptime.
-// Multipliers and modalities refreshed 2026-09-23 from the live /v1/models
-// endpoint (buyer key). Uptime/requests/success stats still come from the
-// owner-only snapshot captured 2026-09-12 — that endpoint requires the owner
-// session, so buyers see this dated copy.
+// Multipliers and modalities refreshed 2026-10-02 from the provider price list.
+// Uptime/requests/success stats still come from the owner-only snapshot captured
+// 2026-09-12 — that endpoint requires the owner session, so buyers see this
+// dated copy.
 // multiplier = tokens charged per unit of work relative to x1.
-export const snapshotAsOf = '2026-09-23';
+export const snapshotAsOf = '2026-10-02';
 
 export const modelSnapshot = {
   'claude-fable-5-1': {"multiplier":8,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.99013,"requests":3952,"success":3913,"providerClass":"claude"},
   'claude-fable-5': {"multiplier":8,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.99674,"requests":6441,"success":6420,"providerClass":"claude"},
+  'claude-opus-5-5': {"multiplier":4,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"providerClass":"claude"},
   'claude-opus-5': {"multiplier":4,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.99561,"requests":20269,"success":20180,"providerClass":"claude"},
   'claude-opus-4-8': {"multiplier":4,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.99654,"requests":2601,"success":2592,"providerClass":"claude"},
   'claude-opus-4-7': {"multiplier":4,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":1,"requests":865,"success":865,"providerClass":"claude"},
@@ -17,10 +18,11 @@ export const modelSnapshot = {
   'claude-sonnet-4-6': {"multiplier":2,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.99856,"requests":15249,"success":15227,"providerClass":"claude"},
   'claude-haiku-4-5': {"multiplier":0.9,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.99906,"requests":25498,"success":25474,"providerClass":"claude"},
   'gpt-6-astra': {"multiplier":7.5,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.97719,"requests":83390,"success":81488},
-  'gpt-5.6-sol': {"multiplier":3,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.98098,"requests":72833,"success":71448},
-  'gpt-5.5': {"multiplier":3,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.97403,"requests":3927,"success":3825},
+  'gpt-5.6-sol': {"multiplier":4,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.98098,"requests":72833,"success":71448},
+  'gpt-5.5': {"multiplier":4,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.97403,"requests":3927,"success":3825},
   'qwen3.8-max': {"multiplier":2.5,"cachedDiscount":1,"vision":true,"input":["text","image","video"],"output":["text"],"uptime":0.99714,"requests":1747,"success":1742},
   'kimi-k3': {"multiplier":2.5,"cachedDiscount":1,"vision":true,"input":["text","image","video","pdf"],"output":["text"],"uptime":0.99293,"requests":16418,"success":16302},
+  'gpt-6.1-sol': {"multiplier":2,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"]},
   'gpt-6-sol': {"multiplier":2,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"]},
   'gemini-3.1-pro': {"multiplier":2,"cachedDiscount":1,"vision":true,"input":["text","image","audio","video","pdf"],"output":["text"],"uptime":1,"requests":2131,"success":2131},
   'gemini-3.6-flash': {"multiplier":2,"cachedDiscount":1,"vision":true,"input":["text","image","audio","video","pdf"],"output":["text"],"uptime":1,"requests":28101,"success":28101},
@@ -37,13 +39,13 @@ export const modelSnapshot = {
   'grok-4.5': {"multiplier":0.5,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.99796,"requests":981,"success":979},
   'grok-4.6': {"multiplier":0.5,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.99945,"requests":10959,"success":10953},
   'grok-4.7': {"multiplier":0.5,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"]},
-  'gpt-5.6-luna': {"multiplier":0.33,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.9896,"requests":95148,"success":94158},
+  'gpt-5.6-luna': {"multiplier":0.3,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.9896,"requests":95148,"success":94158},
   'composer-2.5-fast': {"multiplier":0.3,"cachedDiscount":1,"vision":false,"input":["text"],"output":["text"],"uptime":1,"requests":549,"success":549},
-  'deepseek-v4.1-flash': {"multiplier":0.3,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.98328,"requests":8554,"success":8411},
   'glm-5.3-flash': {"multiplier":0.3,"cachedDiscount":1,"vision":true,"input":["text","image","video","pdf"],"output":["text"],"uptime":0.99952,"requests":39678,"success":39659},
   'mimo-v2.5-pro': {"multiplier":0.3,"cachedDiscount":1,"vision":false,"input":["text"],"output":["text"],"uptime":0.99862,"requests":2900,"success":2896},
   'minimax-m3': {"multiplier":0.3,"cachedDiscount":1,"vision":true,"input":["text","image","video"],"output":["text"],"uptime":1,"requests":22936,"success":22936},
   'gpt-6-luna': {"multiplier":0.25,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"]},
+  'deepseek-v4.1-flash': {"multiplier":0.1,"cachedDiscount":1,"vision":true,"input":["text","image"],"output":["text"],"uptime":0.98328,"requests":8554,"success":8411},
   'deepseek-v4-flash': {"multiplier":0.1,"cachedDiscount":1,"vision":false,"input":["text"],"output":["text"],"uptime":0.99988,"requests":72713,"success":72704},
   'mimo-v2.5': {"multiplier":0.05,"cachedDiscount":1,"vision":true,"input":["text","image","audio","video"],"output":["text"],"uptime":0.98616,"requests":1662,"success":1639},
   'gpt-image-2': {"standalone":true,"uptime":0.91977,"requests":5297,"success":4872},
