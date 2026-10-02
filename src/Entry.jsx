@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { ArrowRight, Eye, EyeOff, KeyRound, Loader2, Monitor, Terminal, Lock } from 'lucide-react';
 import { verifyKey } from './hooks';
 import { useI18n } from './i18n';
+import { AmbientToggle } from './Ambient';
 
 /**
  * Fullscreen two-stage entry: first the API key, then the OS.
  * Either stage can be skipped — the cabinet works without a key
  * (instructions stay available, balance/models require it).
  */
-export function Entry({ onDone }) {
+export function Entry({ onDone, ambientOn, onToggleAmbient }) {
   const [stage, setStage] = useState('key'); // 'key' | 'os'
   const [key, setKey] = useState('');
   const [reveal, setReveal] = useState(false);
@@ -43,6 +44,7 @@ export function Entry({ onDone }) {
   return <div className="entry" id="entry">
     <div className="entry-corner" aria-hidden="true" />
     <div className="entry-brandline"><i aria-hidden="true" /> Relay AI</div>
+    <AmbientToggle on={ambientOn} onToggle={onToggleAmbient} />
 
     {stage === 'key' && <section className={`entry-stage glass ${stage === 'key' ? 'is-active' : ''}`} aria-label={t('entry.key.label')}>
       <div className="entry-kicker">

@@ -979,6 +979,35 @@ dialog.model-dialog::backdrop {
 }
 .language-switch button:hover { color: var(--text-2); }
 .language-switch button.is-active { background: var(--text); color: #0a0b0e; }
+
+/* ============ AMBIENT TOGGLE ============ */
+.ambient-toggle {
+  height: 42px;
+  width: 42px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-soft);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-3);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.ambient-toggle:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+}
+.ambient-toggle.is-on { color: var(--text-2); }
+.entry .ambient-toggle {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  z-index: 6;
+}
+
 .model-copy {
   justify-self: end;
   height: 32px;

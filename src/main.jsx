@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BookOpen, Boxes, CircleHelp, KeyRound, LayoutDashboard } from 'lucide-react';
 import { Entry } from './Entry';
-import { Ambient } from './Ambient';
+import { Ambient, AmbientToggle } from './Ambient';
 import { BalanceView, FaqView, ModelsView } from './Views';
 import { InstructionsView } from './InstructionsView';
 import { ToastProvider, useToast } from './Toast';
@@ -84,7 +84,7 @@ function LanguageSwitch() {
   </div>;
 }
 
-function Topbar({ page, setPage, apiKey, balance, onOpenKeyDialog }) {
+function Topbar({ page, setPage, apiKey, balance, onOpenKeyDialog, ambientOn, onToggleAmbient }) {
   const { t, nf } = useI18n();
   const navigation = [
     ['balance', t('topbar.nav.balance'), LayoutDashboard],
@@ -106,6 +106,7 @@ function Topbar({ page, setPage, apiKey, balance, onOpenKeyDialog }) {
       ><Icon size={15} />{title}</button>)}
     </nav>
     <div className="topbar-tools">
+      <AmbientToggle on={ambientOn} onToggle={onToggleAmbient} />
       <LanguageSwitch />
       <button className={`chip-balance ${apiKey ? 'has-key' : ''}`} onClick={() => setPage('balance')} title={t('topbar.balance')}>
         <span className="lamp" aria-hidden="true" />
@@ -126,6 +127,7 @@ function App() {
   const [entered, setEntered] = useStoredState('relay.ai.entered.v1', '');
   const [key, setKey] = useState(storedKey);
   const [os, setOs] = useStoredState('relay.ai.os.v1', 'Windows');
+  const [ambientOn, setAmbientOn] = useStoredState('relay.ai.ambient.v1', '1');
   const [page, setPage] = useState('balance');
   const [dialogOpen, setDialogOpen] = useState(false);
   const account = useResource(loadAccount, key);
@@ -151,10 +153,11 @@ function App() {
   }
 
   return <>
-    <Ambient />
-    {showEntry && <Entry onDone={finishEntry} />}
+    {ambientOn === '1' && <Ambient />}
+    {showEntry && <Entry onDone={finishEntry} ambientOn={ambientOn === '1'} onToggleAmbient={() => setAmbientOn(ambientOn === '1' ? '0' : '1')} />}
     <div className={`app-shell ${showEntry ? '' : 'is-ready'}`}>
-      <Topbar page={page} setPage={setPage} apiKey={key} balance={account.data} onOpenKeyDialog={() => setDialogOpen(true)} />
+      <Topbar page={page} setPage={setPage} apiKey={key} balance={account.data} onOpenKeyDialog={() => setDialogOpen(true)}
+        ambientOn={ambientOn === '1'} onToggleAmbient={() => setAmbientOn(ambientOn === '1' ? '0' : '1')} />
       <main>
         {page === 'balance' && <BalanceView apiKey={key} accountResource={account} onOpenKeyDialog={() => setDialogOpen(true)} onGoInstructions={() => setPage('instructions')} />}
         {page === 'instructions' && <InstructionsView apiKey={key} os={os} setOs={setOs} onOpenKeyDialog={() => setDialogOpen(true)} />}

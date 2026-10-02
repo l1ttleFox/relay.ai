@@ -1,9 +1,12 @@
 import React, { useEffect, useRef } from 'react';
+import { Sparkles, PowerOff } from 'lucide-react';
+import { useI18n } from './i18n';
 
 /**
  * Ambient background: a slow particle constellation on canvas plus
  * drifting aurora orbs. Lightweight: pauses on hidden tabs, respects
  * prefers-reduced-motion, scales particle count to viewport area.
+ * Can be fully disabled via <AmbientToggle /> for weak hardware.
  */
 export function Ambient() {
   const canvasRef = useRef(null);
@@ -168,4 +171,18 @@ export function Ambient() {
     <div className="ambient-grid" />
     <div className="ambient-noise" />
   </div>;
+}
+
+/** Button that toggles the animated ambient background on/off (persisted). */
+export function AmbientToggle({ on, onToggle }) {
+  const { t } = useI18n();
+  const label = on ? t('ambient.toggleOn') : t('ambient.toggleOff');
+  return <button
+    type="button"
+    className={`ambient-toggle ${on ? 'is-on' : ''}`}
+    onClick={onToggle}
+    title={label}
+    aria-label={label}
+    aria-pressed={on}
+  >{on ? <Sparkles size={15} /> : <PowerOff size={15} />}</button>;
 }

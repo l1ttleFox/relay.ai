@@ -40,6 +40,9 @@ const translations = {
     'topbar.brandSub': 'кабинет покупателя',
     'topbar.language': 'Язык',
 
+    'ambient.toggleOn': 'Интерактивный фон включён — нажмите, чтобы отключить (для слабых ПК)',
+    'ambient.toggleOff': 'Интерактивный фон отключён — нажмите, чтобы включить',
+
     'dialog.security': 'Безопасность · только эта вкладка',
     'dialog.title': 'Ваш API-ключ',
     'dialog.lead': 'Ключ используется для проверки остатка, каталога моделей и подстановки в команды инструкций. Хранится только в текущей вкладке браузера.',
@@ -190,6 +193,9 @@ const translations = {
     'topbar.keyUnset': 'API key',
     'topbar.brandSub': 'buyer cabinet',
     'topbar.language': 'Language',
+
+    'ambient.toggleOn': 'Interactive background is on — click to turn off (for low-end PCs)',
+    'ambient.toggleOff': 'Interactive background is off — click to turn on',
 
     'dialog.security': 'Security · this tab only',
     'dialog.title': 'Your API key',
