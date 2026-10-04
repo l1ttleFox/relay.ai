@@ -9,6 +9,7 @@ import { ToastProvider, useToast } from './Toast';
 import { I18nProvider, useI18n } from './i18n';
 import { loadAccount, useResource, useStoredState } from './hooks';
 import { api } from './api';
+import { PurchaseButton } from './components';
 import './styles.css';
 
 // The key lives in sessionStorage: it survives page reloads but dies with the tab.
@@ -64,6 +65,7 @@ function KeyDialog({ open, initialKey, onClose, onSave }) {
       <p className="field-error" role="alert">{error}</p>
       <div className="dialog-actions">
         <button className="btn-primary" type="submit" disabled={checking}>{checking ? t('dialog.checking') : t('dialog.submit')}</button>
+        {!initialKey && <PurchaseButton className="btn-ghost dialog-buy-button" />}
         {initialKey && <button className="btn-danger" type="button" onClick={() => onSave('')}>{t('dialog.remove')}</button>}
         <button className="btn-ghost" type="button" onClick={onClose} style={{ height: 48 }}>{t('dialog.close')}</button>
       </div>
@@ -118,6 +120,7 @@ function Topbar({ page, setPage, apiKey, balance, onOpenKeyDialog, ambientOn, on
       <button className={`chip-key ${apiKey ? 'is-set' : ''}`} onClick={onOpenKeyDialog}>
         <KeyRound size={14} />{apiKey ? t('topbar.keySet') : t('topbar.keyUnset')}
       </button>
+      {!apiKey && <PurchaseButton className="btn-primary topbar-buy-button" />}
     </div>
   </header>;
 }

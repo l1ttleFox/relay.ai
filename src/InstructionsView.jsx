@@ -3,7 +3,7 @@ import { ArrowRight, KeyRound, Monitor } from 'lucide-react';
 import { loadGuides, useResource } from './hooks';
 import { personalizeCommand, instructionStep } from './instructionCommands';
 import { translateCode, translateNotice, translateStep } from './instructionsEn';
-import { CodeWindow, ErrorBlock, LoadingBlock } from './components';
+import { CodeWindow, ErrorBlock, LoadingBlock, PurchaseButton } from './components';
 import { useToast } from './Toast';
 import { useI18n } from './i18n';
 
@@ -89,9 +89,12 @@ export function InstructionsView({ apiKey, os, setOs, onOpenKeyDialog }) {
         <h1>{t('instructions.titleA')} <em>{t('instructions.titleB')}</em></h1>
         <p>{apiKey ? t('instructions.descKey') : t('instructions.descNoKey')}</p>
       </div>
-      {!apiKey && <button className="btn-ghost" onClick={onOpenKeyDialog} style={{ flex: '0 0 auto' }}>
-        <KeyRound size={15} /> {t('balance.connect')}
-      </button>}
+      {!apiKey && <div className="no-key-actions">
+        <PurchaseButton />
+        <button className="btn-ghost" onClick={onOpenKeyDialog}>
+          <KeyRound size={15} /> {t('balance.connect')}
+        </button>
+      </div>}
     </div>
 
     <div className="os-tabs" role="tablist" aria-label="OS">

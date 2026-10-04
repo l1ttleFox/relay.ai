@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Check, Copy } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Check, Copy } from 'lucide-react';
 import { useI18n } from './i18n';
+
+export const PURCHASE_URL = 'https://funpay.com/users/4838629/';
+
+export function PurchaseButton({ className = 'btn-primary buy-link-button' }) {
+  const { t } = useI18n();
+  return <a className={className} href={PURCHASE_URL} target="_blank" rel="noreferrer">
+    {t('balance.buy')} <ArrowRight size={15} />
+  </a>;
+}
+
+export function PurchaseLinks() {
+  return <div className="purchase-links"><PurchaseButton /></div>;
+}
 
 export function CodeWindow({ title, code, onCopied }) {
   const [done, setDone] = useState(false);

@@ -357,6 +357,8 @@ button { font-family: inherit; }
   margin-top: 22px;
   text-align: center;
 }
+.entry-purchase { margin-top: 16px; }
+.entry-purchase .buy-link-button { width: 100%; }
 .entry-skip button {
   border: 0;
   background: transparent;
@@ -583,6 +585,7 @@ button { font-family: inherit; }
 }
 .chip-key:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-1px); }
 .chip-key.is-set { background: var(--text); color: #0a0b0e; }
+.topbar-buy-button { width: auto; height: 42px; min-height: 42px; padding: 0 16px; font-size: 11px; text-decoration: none; }
 
 /* ============ VIEWS ============ */
 .view {
@@ -620,6 +623,8 @@ button { font-family: inherit; }
   font-size: 14px;
   line-height: 1.65;
 }
+.no-key-actions { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+.no-key-actions .buy-link-button { width: auto; }
 
 /* ============ BALANCE VIEW ============ */
 .balance-hero {
@@ -858,6 +863,8 @@ button { font-family: inherit; }
   font-size: 12px;
   line-height: 1.55;
 }
+.public-catalog-actions { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+.public-catalog-actions .buy-link-button { width: auto; }
 
 /* ============ MODEL DETAIL DIALOG ============ */
 dialog.model-dialog {
@@ -1439,6 +1446,7 @@ dialog.key-dialog::backdrop {
 .key-dialog .lead { margin: 0 0 24px; color: var(--text-2); font-size: 13px; line-height: 1.6; }
 .key-dialog .dialog-actions { display: flex; gap: 10px; margin-top: 22px; }
 .key-dialog .dialog-actions .btn-primary { flex: 1; height: 48px; font-size: 13px; }
+.key-dialog .dialog-buy-button { height: 48px; min-height: 48px; padding: 0 16px; text-decoration: none; white-space: nowrap; }
 .btn-danger {
   height: 48px;
   padding: 0 20px;
@@ -1557,6 +1565,8 @@ dialog.key-dialog::backdrop {
   .client-btn { width: auto; min-width: max-content; }
   .sidebar-head { display: none; }
   .page-head { flex-direction: column; align-items: flex-start; }
+  .no-key-actions { width: 100%; }
+  .no-key-actions .btn-ghost, .no-key-actions .buy-link-button { width: 100%; }
   .model-thead { display: none; }
   .model-trow { grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 10px; padding: 14px 16px; }
   .model-meta { display: none; }
@@ -1564,7 +1574,8 @@ dialog.key-dialog::backdrop {
   .uptime-badge { font-size: 10.5px; padding: 5px 8px; }
   .view { padding-bottom: 130px; }
   .public-catalog-note { align-items: flex-start; flex-direction: column; margin-top: -12px; }
-  .public-catalog-note .btn-ghost { width: 100%; }
+  .public-catalog-actions { width: 100%; flex-direction: column; }
+  .public-catalog-actions .btn-ghost, .public-catalog-actions .buy-link-button { width: 100%; }
   .connection-option-grid { grid-template-columns: 1fr; }
   .connection-option { min-height: 0; }
 }
@@ -1577,6 +1588,7 @@ dialog.key-dialog::backdrop {
   .entry-brandline { font-size: 10px; }
   .chip-balance { display: none; }
   .chip-key { padding: 0 12px; font-size: 10px; }
+  .topbar-buy-button { display: none; }
   .uptime-badge { display: none; }
   .model-trow { grid-template-columns: minmax(0, 1fr) auto auto; }
   .model-copy { padding: 0 8px; font-size: 8px; }

@@ -3,6 +3,7 @@ import { ArrowRight, Eye, EyeOff, KeyRound, Loader2, Monitor, Terminal, Lock } f
 import { verifyKey } from './hooks';
 import { useI18n } from './i18n';
 import { AmbientToggle } from './Ambient';
+import { PurchaseButton } from './components';
 
 /**
  * Fullscreen two-stage entry: first the API key, then the OS.
@@ -76,6 +77,7 @@ export function Entry({ onDone, ambientOn, onToggleAmbient }) {
           {checking ? <><Loader2 size={17} className="spin" /> {t('entry.key.checking')}</> : <>{t('entry.key.submit')} <ArrowRight size={17} /></>}
         </button>
       </form>
+      <div className="entry-purchase"><PurchaseButton /></div>
       <div className="entry-skip">
         <button type="button" onClick={() => onDone('', 'Windows')}>{t('entry.key.skip')}</button>
       </div>

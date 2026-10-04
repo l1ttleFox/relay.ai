@@ -3,18 +3,9 @@ import { Activity, ArrowRight, Eye, KeyRound, RefreshCw, Search, ShieldCheck, X,
 import { loadModels, useResource } from './hooks';
 import { modelInfo, multiplierStyle, uptimeTier } from './modelScale';
 import { modelSnapshot, snapshotAsOf } from './modelData';
-import { ErrorBlock, LoadingBlock } from './components';
+import { ErrorBlock, LoadingBlock, PurchaseButton, PurchaseLinks } from './components';
 import { useToast } from './Toast';
 import { useI18n } from './i18n';
-
-const PURCHASE_URL = 'https://funpay.com/users/4838629/';
-
-function PurchaseLinks() {
-  const { t } = useI18n();
-  return <div className="purchase-links">
-    <a className="btn-primary buy-link-button" href={PURCHASE_URL} target="_blank" rel="noreferrer">{t('balance.buy')} <ArrowRight size={15} /></a>
-  </div>;
-}
 
 const fmtUptime = (value, locale) => (value == null
   ? '—'
@@ -132,7 +123,7 @@ export function BalanceView({ apiKey, accountResource, onOpenKeyDialog, onGoInst
         {resource.data.remainingTokens < 100000 && <p className="balance-note balance-low">{t('balance.low')}</p>}
         {resource.error && <p className="balance-note is-error" role="alert">{t('balance.staleError', { error: translateError(resource.error) })}</p>}
         <div className="balance-row">
-          <a className="btn-primary buy-link-button" href={PURCHASE_URL} target="_blank" rel="noreferrer">{t('balance.buy')} <ArrowRight size={15} /></a>
+          <PurchaseButton />
           <button className="btn-ghost" onClick={resource.refresh} disabled={resource.loading}>
             <RefreshCw size={15} /> {t('balance.refresh')}
           </button>
@@ -267,7 +258,10 @@ export function ModelsView({ apiKey, onOpenKeyDialog }) {
         <span className="mono-label">{t('models.publicLabel')}</span>
         <p>{t('models.publicNote')}</p>
       </div>
-      <button className="btn-ghost" onClick={onOpenKeyDialog}><KeyRound size={15} /> {t('balance.connect')}</button>
+      <div className="public-catalog-actions">
+        <PurchaseButton />
+        <button className="btn-ghost" onClick={onOpenKeyDialog}><KeyRound size={15} /> {t('balance.connect')}</button>
+      </div>
     </div>}
     {apiKey && resource.loading && !resource.data && <LoadingBlock label={t('models.loading')} />}
     {apiKey && resource.error && !resource.data && <ErrorBlock message={translateError(resource.error)} />}
