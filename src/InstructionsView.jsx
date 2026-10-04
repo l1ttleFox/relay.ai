@@ -9,6 +9,31 @@ import { useI18n } from './i18n';
 
 const osList = ['Windows', 'macOS', 'Linux'];
 
+function PublicConnectionOverview({ guide, activeOs }) {
+  const { t } = useI18n();
+  const options = [
+    ['01', t('instructions.public.option1.title'), t('instructions.public.option1.text')],
+    ['02', t('instructions.public.option2.title'), t('instructions.public.option2.text')],
+    ['03', t('instructions.public.option3.title'), t('instructions.public.option3.text')],
+  ];
+  return <div className="public-connection-overview">
+    <div className="public-overview-head">
+      <span className="mono-label">{t('instructions.public.label')}</span>
+      <p>{t('instructions.public.lead')}</p>
+      <p>{t('instructions.public.supported', { title: guide.title, systems: guide.os.join(' · ') })}</p>
+      {!guide.os.includes(activeOs) && <p>{t('instructions.unavailableA', { title: guide.title, os: activeOs })}</p>}
+    </div>
+    <div className="connection-option-grid">
+      {options.map(([number, title, text]) => <article className="connection-option" key={number}>
+        <span className="connection-option-number">{number}</span>
+        <h3>{title}</h3>
+        <p>{text}</p>
+      </article>)}
+    </div>
+    <p className="public-overview-foot">{t('instructions.public.footer')}</p>
+  </div>;
+}
+
 function clientBadge(title) {
   const words = title.replace(/[^A-Za-zА-Яа-яЁё0-9 ]/g, '').trim().split(/\s+/);
   return (words.length > 1 ? words[0][0] + words[1][0] : title.slice(0, 2)).toUpperCase();
@@ -26,6 +51,7 @@ export function InstructionsView({ apiKey, os, setOs, onOpenKeyDialog }) {
   const content = useMemo(() => {
     if (!guide || !resource.data) return null;
     const supported = guide.os.includes(activeOs);
+    if (!apiKey) return { supported };
     const example = supported
       ? guide.examples.find(item => !item.os || item.os === activeOs)
         || (guide.source === 'local-example'
@@ -112,12 +138,14 @@ export function InstructionsView({ apiKey, os, setOs, onOpenKeyDialog }) {
           {guide.status === 'example' && <span className="mono-label" style={{ flex: '0 0 auto' }}>{t('instructions.example')}</span>}
         </header>
 
-        {!content?.supported && <div className="guide-empty">
-          {t('instructions.unavailableA', { title: guide.title, os: activeOs })}
-          <br />{t('instructions.unavailableB')}
-        </div>}
+          {!apiKey && <PublicConnectionOverview guide={guide} activeOs={activeOs} />}
 
-        {content?.supported && <>
+          {apiKey && !content?.supported && <div className="guide-empty">
+           {t('instructions.unavailableA', { title: guide.title, os: activeOs })}
+           <br />{t('instructions.unavailableB')}
+         </div>}
+
+         {apiKey && content?.supported && <>
           {content.steps.length > 0 && <>
             <p className="section-label">{t('instructions.steps')}</p>
             <ol className="steps-list">
@@ -132,7 +160,7 @@ export function InstructionsView({ apiKey, os, setOs, onOpenKeyDialog }) {
           {content.code && <>
             <p className="section-label">{activeOs === 'Windows' ? 'PowerShell' : 'Terminal'}</p>
             <p className="code-hint">
-              {apiKey ? t('instructions.hintKey') : t('instructions.hintNoKey')}
+              {t('instructions.hintKey')}
               {content.code.includes('MODEL_ID') && t('instructions.hintModelId')}
             </p>
             <CodeWindow title={`${guide.title} · ${activeOs}`} code={content.code} onCopied={onCopied} />

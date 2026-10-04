@@ -7,7 +7,7 @@ import { AmbientToggle } from './Ambient';
 /**
  * Fullscreen two-stage entry: first the API key, then the OS.
  * Either stage can be skipped — the cabinet works without a key
- * (instructions stay available, balance/models require it).
+ * (public models and connection overviews remain available).
  */
 export function Entry({ onDone, ambientOn, onToggleAmbient }) {
   const [stage, setStage] = useState('key'); // 'key' | 'os'

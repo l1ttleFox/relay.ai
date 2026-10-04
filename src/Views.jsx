@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Activity, ArrowRight, Eye, KeyRound, RefreshCw, Search, ShieldCheck, X, Zap } from 'lucide-react';
 import { loadModels, useResource } from './hooks';
 import { modelInfo, multiplierStyle, uptimeTier } from './modelScale';
-import { snapshotAsOf } from './modelData';
+import { modelSnapshot, snapshotAsOf } from './modelData';
 import { ErrorBlock, LoadingBlock } from './components';
 import { useToast } from './Toast';
 import { useI18n } from './i18n';
@@ -228,11 +228,17 @@ export function ModelsView({ apiKey, onOpenKeyDialog }) {
   const toast = useToast();
   const { t, locale, translateError } = useI18n();
 
+  const publicModels = useMemo(
+    () => Object.keys(modelSnapshot).map(id => ({ id })),
+    [],
+  );
   const models = useMemo(() => {
-    const list = Array.isArray(resource.data?.data) ? resource.data.data : [];
+    const list = apiKey
+      ? (Array.isArray(resource.data?.data) ? resource.data.data : [])
+      : publicModels;
     const q = query.trim().toLowerCase();
     return q ? list.filter(m => String(m.id).toLowerCase().includes(q)) : list;
-  }, [resource.data, query]);
+  }, [apiKey, publicModels, resource.data, query]);
 
   async function copyId(id) {
     try {
@@ -243,42 +249,29 @@ export function ModelsView({ apiKey, onOpenKeyDialog }) {
     }
   }
 
-  if (!apiKey) {
-    return <div className="view">
-      <div className="page-head">
-        <div>
-          <span className="mono-label">{t('models.kicker')}</span>
-          <h1>{t('models.titleA')} <em>{t('models.titleB')}</em></h1>
-          <p>{t('models.desc')}</p>
-        </div>
-      </div>
-      <div className="empty-card glass">
-        <h2>{t('models.needKey.title')}</h2>
-        <p>{t('models.needKey.text')}</p>
-        <button className="btn-primary" style={{ maxWidth: 320, margin: '0 auto' }} onClick={onOpenKeyDialog}>
-          <KeyRound size={17} /> {t('balance.connect')}
-        </button>
-      </div>
-      <ModelDialog model={details} onClose={() => setDetails(null)} />
-    </div>;
-  }
-
   const snapshotDate = new Date(`${snapshotAsOf}T00:00:00`).toLocaleDateString(locale);
   return <div className="view">
     <div className="page-head">
       <div>
         <span className="mono-label">{t('models.kicker')}</span>
         <h1>{t('models.titleA')} <em>{t('models.titleB')}</em></h1>
-        <p>{t('models.desc')}</p>
+        <p>{t(apiKey ? 'models.desc' : 'models.publicDesc')}</p>
       </div>
       <label className="search-field">
         <Search size={16} aria-hidden="true" />
         <input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('models.search')} aria-label={t('models.search')} />
       </label>
     </div>
-    {resource.loading && !resource.data && <LoadingBlock label={t('models.loading')} />}
-    {resource.error && !resource.data && <ErrorBlock message={translateError(resource.error)} />}
-    {resource.data && <div className="model-table glass">
+    {!apiKey && <div className="public-catalog-note glass">
+      <div>
+        <span className="mono-label">{t('models.publicLabel')}</span>
+        <p>{t('models.publicNote')}</p>
+      </div>
+      <button className="btn-ghost" onClick={onOpenKeyDialog}><KeyRound size={15} /> {t('balance.connect')}</button>
+    </div>}
+    {apiKey && resource.loading && !resource.data && <LoadingBlock label={t('models.loading')} />}
+    {apiKey && resource.error && !resource.data && <ErrorBlock message={translateError(resource.error)} />}
+    {(resource.data || !apiKey) && <div className="model-table glass">
       <div className="model-thead" aria-hidden="true">
         <span>{t('models.col.model')}</span>
         <span>{t('models.col.provider')}</span>
@@ -304,7 +297,7 @@ export function ModelsView({ apiKey, onOpenKeyDialog }) {
         </div>;
       })}
     </div>}
-    {resource.data && <p className="pricing-note">{t('models.pricingNote', { date: snapshotDate })}</p>}
+    {(resource.data || !apiKey) && <p className="pricing-note">{t(apiKey ? 'models.pricingNote' : 'models.publicPricingNote', { date: snapshotDate })}</p>}
     {resource.error && resource.data && <p className="balance-note is-error" role="alert" style={{ textAlign: 'center', marginTop: 18 }}>{t('balance.staleError', { error: translateError(resource.error) })}</p>}
     <ModelDialog model={details} onClose={() => setDetails(null)} />
   </div>;
@@ -335,7 +328,7 @@ function faqItems(lang) {
     },
     {
       q: 'How do I update or remove the key?',
-      a: <p>Click the key button in the top right corner. In the dialog you can enter a new key or remove the current one — the balance and model catalog stop loading, and commands in the instructions revert to the <code>YOUR_API_KEY</code> template.</p>,
+      a: <p>Click the key button in the top right corner. In the dialog you can enter a new key or remove the current one — the balance and live model catalog stop loading, and the instructions show a general overview without commands.</p>,
     },
   ];
   return [
@@ -361,7 +354,7 @@ function faqItems(lang) {
     },
     {
       q: 'Как обновить или удалить ключ в кабинете?',
-      a: <p>Нажмите на кнопку ключа в правом верхнем углу. В диалоге можно ввести новый ключ или удалить текущий — остаток и каталог моделей перестанут загружаться, а команды в инструкциях вернутся к шаблону <code>YOUR_API_KEY</code>.</p>,
+      a: <p>Нажмите на кнопку ключа в правом верхнем углу. В диалоге можно ввести новый ключ или удалить текущий — остаток и живой каталог моделей перестанут загружаться, а в инструкциях останется общий обзор без команд.</p>,
     },
   ];
 }
@@ -372,13 +365,13 @@ export function FaqView() {
   const quick = lang === 'en'
     ? {
       q: 'How do I set up my first client?',
-      body: <p>Open “Instructions”, pick your OS and a client — for example Codex or Claude Code. If a key is connected, the commands already contain it: just copy and run.</p>,
+      body: <p>Open “Instructions”, pick your OS and a client — for example Codex or Claude Code. Connect a key to see ready-to-run commands.</p>,
       badge1: 'No key storage',
       badge2: 'Direct connection to the provider',
     }
     : {
       q: 'Как быстро настроить первый клиент?',
-      body: <p>Откройте раздел «Инструкции», выберите свою ОС и клиент — например Codex или Claude Code. Если ключ подключён, команды уже содержат его: достаточно скопировать и выполнить.</p>,
+      body: <p>Откройте раздел «Инструкции», выберите свою ОС и клиент — например Codex или Claude Code. Подключите ключ, чтобы получить готовые команды.</p>,
       badge1: 'Без хранения ключей',
       badge2: 'Прямое подключение к провайдеру',
     };
