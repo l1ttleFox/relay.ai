@@ -31,6 +31,7 @@ const stepMap = {
 
 const noticeMap = {
   'Требуется подписка Cursor.': 'A Cursor subscription is required per the provider instructions.',
+  'Провайдер импортируется из реестра и сохраняет технический ID cheapvibecode.': 'The provider is imported from the registry and keeps the technical id cheapvibecode.',
 };
 
 /** Translates one already-personalized Russian step into English. */

@@ -48,13 +48,18 @@ export function instructionCatalog({ publicOrigin = process.env.PUBLIC_ORIGIN ||
     installer(publicRoot, 'claude', 'Claude Code CLI', ['cw', 'cm', 'cl'], ['crw', 'crm', 'crl'], { authorization: true }),
     installer(publicRoot, 'claude-app', 'Claude App', ['iclaudew', 'iclaudem', null], ['rclaudew', 'rclaudem', null]),
     installer(publicRoot, 'opencode', 'OpenCode', ['iow', 'iom', 'iol'], ['row', 'rom', 'rol'], {
-      modelFormat: 'cheapvibecode/MODEL_ID', downloadUrl: `${publicRoot}/downloads/opencode.jsonc`,
+      modelFormat: 'relayai/MODEL_ID', downloadUrl: `${publicRoot}/downloads/opencode.jsonc`,
     }),
     installer(publicRoot, 'cursor', 'Cursor', ['icrw', 'icrm', 'icr'], ['rcrw', 'rcrm', 'rcrl'], {
       modelFormat: 'MODEL_ID-cursor', notice: 'По инструкции провайдера требуется подписка Cursor.',
     }),
     installer(publicRoot, 'gemini-cli', 'Gemini CLI', ['igeminiw', 'igeminim', 'igeminil'], ['rgeminiw', 'rgeminim', 'rgeminil']),
-    installer(publicRoot, 'kimi-code', 'Kimi Code CLI', ['ikw', 'ikm', 'ikl'], ['rkw', 'rkm', 'rkl'], { modelFormat: 'cheapvibecode/MODEL_ID' }),
+    installer(publicRoot, 'kimi-code', 'Kimi Code CLI', ['ikw', 'ikm', 'ikl'], ['rkw', 'rkm', 'rkl'], {
+      // The Kimi provider is imported from the upstream /kimi-models registry,
+      // which defines its id server-side; renaming it would break the import.
+      modelFormat: 'cheapvibecode/MODEL_ID',
+      notice: 'Провайдер импортируется из реестра и сохраняет технический ID cheapvibecode.',
+    }),
     installer(publicRoot, 'deepseek-harness', 'DeepSeek Harness', ['idhw', 'idhm', 'idhl'], ['rdhw', 'rdhm', 'rdhl'], {
       steps: ['Установите DeepSeek Harness.', 'Остановите запущенный Harness (Ctrl+C).',
         'Выполните команду для своей ОС, заменив YOUR_API_KEY.', 'Запустите npx @deepseek-ai/dsh web и откройте новую сессию.'],

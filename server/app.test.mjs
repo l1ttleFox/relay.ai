@@ -119,6 +119,48 @@ test('installer scripts keep direct API URLs on the provider host', async t => {
   assert.equal(upstreamPath, '/uc?shell=powershell');
 });
 
+test('proxied scripts rebrand the provider as Relay AI but keep API URLs', async t => {
+  const script = [
+    `$ProviderId = 'cheapvibecode'`,
+    `$ProviderName = 'CheapVibeCode'`,
+    `"name": "CheapVibeCode",`,
+    `"small_model": "cheapvibecode/claude-haiku-4-5",`,
+    `"baseURL": "https://cheapvibecode.ru/v1",`,
+    `"X-CheapVibeCode-Client": "opencode"`,
+    `$ApiRoot = "https://ru.cheapvibecode.ru"`,
+    `if (/cheapvibecode/i.test(currentBase)) { }`,
+    `legacy_model_names = ["cheapvibecode-grok","cheapvibecode-composer"]`,
+    `$env:CVC_API_KEY='key'; # previous_cvc_api_key`,
+  ].join('\n');
+  const base = await setup(t, async () => assert.fail('AI data endpoint must not be called'),
+    async () => new Response(script, { headers: { 'Content-Type': 'text/plain' } }));
+  assert.equal(await (await fetch(base + '/iow', { headers: headers('key-a') })).text(), [
+    `$ProviderId = 'relayai'`,
+    `$ProviderName = 'Relay AI'`,
+    `"name": "Relay AI",`,
+    `"small_model": "relayai/claude-haiku-4-5",`,
+    `"baseURL": "https://cheapvibecode.ru/v1",`,
+    `"X-RelayAI-Client": "opencode"`,
+    `$ApiRoot = "https://ru.cheapvibecode.ru"`,
+    `if (/cheapvibecode/i.test(currentBase)) { }`,
+    `legacy_model_names = ["cheapvibecode-grok","cheapvibecode-composer"]`,
+    `$env:CVC_API_KEY='key'; # previous_cvc_api_key`,
+  ].join('\n'));
+  // Kimi imports its provider from the upstream registry, so its id is kept.
+  assert.equal(await (await fetch(base + '/ikw', { headers: headers('key-a') })).text(), [
+    `$ProviderId = 'cheapvibecode'`,
+    `$ProviderName = 'Relay AI'`,
+    `"name": "Relay AI",`,
+    `"small_model": "cheapvibecode/claude-haiku-4-5",`,
+    `"baseURL": "https://cheapvibecode.ru/v1",`,
+    `"X-RelayAI-Client": "opencode"`,
+    `$ApiRoot = "https://ru.cheapvibecode.ru"`,
+    `if (/cheapvibecode/i.test(currentBase)) { }`,
+    `legacy_model_names = ["cheapvibecode-grok","cheapvibecode-composer"]`,
+    `$env:CVC_API_KEY='key'; # previous_cvc_api_key`,
+  ].join('\n'));
+});
+
 test('upstream errors are mapped without exposing upstream bodies', async t => {
   let status = 401;
   const base = await setup(t, async () => {
@@ -175,7 +217,8 @@ test('instructions are hosted locally while AI endpoints remain direct', async t
   assert.ok(get('codex-cli').examples.find(e => e.os === 'macOS').code.includes('/icm'));
   assert.ok(get('claude').examples[0].code.includes('-Headers $h'));
   assert.equal(get('cursor').modelFormat, 'MODEL_ID-cursor');
-  assert.equal(get('opencode').modelFormat, 'cheapvibecode/MODEL_ID');
+  assert.equal(get('opencode').modelFormat, 'relayai/MODEL_ID');
+  assert.equal(get('kimi-code').modelFormat, 'cheapvibecode/MODEL_ID');
   assert.equal(get('python').source, 'local-example');
   assert.ok(get('python').examples[0].code.includes('base_url="https://ru.cheapvibecode.ru/v1"'));
   assert.equal(data.endpoints.models, 'https://relay-ai-ami6.onrender.com/api/models');

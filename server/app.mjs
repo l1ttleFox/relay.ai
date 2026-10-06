@@ -23,6 +23,34 @@ function proxyInstructionLinks(body, publicOrigin) {
   });
 }
 
+// Kimi Code imports its provider from the upstream /kimi-models registry, so the
+// provider id there is server-controlled: renaming it in the script would break
+// the post-import checks. Only display names are rebranded on these routes.
+const kimiIdRoutes = new Set(['/ikw', '/ikm', '/ikl', '/rkw', '/rkm', '/rkl']);
+
+// White-label the proxied instructions: the provider must appear as Relay AI
+// while every API URL keeps pointing at the upstream host. The id rewrite
+// therefore skips hostnames (*.cheapvibecode.ru), the URL-testing regex literal
+// /cheapvibecode/i, and the legacy Grok model names that uninstallers must
+// still recognize. Header name and camelCase identifier are rewritten first so
+// the display-name rule cannot inject a space into them. State file names and
+// backup prefixes are rewritten together with the installers that create them,
+// so paired install/uninstall scripts stay consistent.
+//
+// Environment variables stay as CVC_*: the install, uninstall and uc scripts are
+// separate stateless documents and share these names as an interface (the user's
+// $env:CVC_API_KEY is read by every installer). The rewrite rules below match
+// only the CheapVibeCode spellings, so CVC_* names pass through untouched.
+function rebrandProvider(body, pathname) {
+  const out = body
+    .replaceAll('X-CheapVibeCode-Client', 'X-RelayAI-Client')
+    .replaceAll('isCheapVibeCodeBaseURL', 'isRelayAiBaseURL')
+    .replaceAll('CheapVibeCode', 'Relay AI');
+  return kimiIdRoutes.has(pathname)
+    ? out
+    : out.replace(/cheapvibecode(?!\.ru|\/i\b|-grok\b|-composer\b)/g, 'relayai');
+}
+
 export function createApp({ request }) {
   const publicOrigin = process.env.PUBLIC_ORIGIN || 'https://relay-ai-ami6.onrender.com';
   const instructions = instructionCatalog({ publicOrigin });
@@ -60,7 +88,7 @@ export function createApp({ request }) {
           'Content-Type': upstream.headers.get('content-type') || 'text/plain; charset=utf-8',
         });
         const body = await upstream.text();
-        return res.end(proxyInstructionLinks(body, publicOrigin));
+        return res.end(rebrandProvider(proxyInstructionLinks(body, publicOrigin), path));
       }
       if (path === '/api/instructions') return send(res, 200, instructions);
       const key = /^Bearer ([^\s]+)$/i.exec(req.headers.authorization || '')?.[1];
