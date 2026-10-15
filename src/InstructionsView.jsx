@@ -6,6 +6,7 @@ import { translateCode, translateNotice, translateStep } from './instructionsEn'
 import { CodeWindow, ErrorBlock, LoadingBlock, PurchaseButton } from './components';
 import { useToast } from './Toast';
 import { useI18n } from './i18n';
+import { TelegramGuide } from './TelegramBot';
 
 const osList = ['Windows', 'macOS', 'Linux'];
 
@@ -41,15 +42,16 @@ function clientBadge(title) {
 
 export function InstructionsView({ apiKey, os, setOs, onOpenKeyDialog }) {
   const resource = useResource(loadGuides, '', false);
-  const [selected, setSelected] = useState('codex');
+  const [selected, setSelected] = useState('telegram');
   const toast = useToast();
   const { t, lang, translateError } = useI18n();
-  const guides = resource.data?.guides ?? [];
+  const guides = [{ id: 'telegram', title: t('telegram.title'), source: 'telegram' }, ...(resource.data?.guides ?? [])];
   const guide = guides.find(g => g.id === selected) ?? guides[0];
+  const isTelegram = guide.id === 'telegram';
   const activeOs = osList.includes(os) ? os : 'Windows';
 
   const content = useMemo(() => {
-    if (!guide || !resource.data) return null;
+    if (guide.id === 'telegram' || !resource.data) return null;
     const supported = guide.os.includes(activeOs);
     if (!apiKey) return { supported };
     const example = supported
@@ -97,7 +99,7 @@ export function InstructionsView({ apiKey, os, setOs, onOpenKeyDialog }) {
       </div>}
     </div>
 
-    <div className="os-tabs" role="tablist" aria-label="OS">
+    {!isTelegram && <div className="os-tabs" role="tablist" aria-label="OS">
       {osList.map(name => <button
         key={name}
         role="tab"
@@ -107,12 +109,12 @@ export function InstructionsView({ apiKey, os, setOs, onOpenKeyDialog }) {
       >
         {name === 'Windows' && <Monitor size={14} aria-hidden="true" />}{name}
       </button>)}
-    </div>
+    </div>}
 
     {resource.loading && !resource.data && <LoadingBlock label={t('component.loading')} />}
     {resource.error && !resource.data && <ErrorBlock message={translateError(resource.error)} />}
 
-    {resource.data && guide && <div className="workspace glass">
+    <div className="workspace glass">
       <aside className="client-sidebar">
         <div className="sidebar-head"><span>{t('instructions.clients')}</span><span>{guides.length}</span></div>
         <div className="client-list" role="listbox" aria-label={t('instructions.clients')}>
@@ -125,7 +127,7 @@ export function InstructionsView({ apiKey, os, setOs, onOpenKeyDialog }) {
           >
             <span className="client-badge" aria-hidden="true">{clientBadge(g.title)}</span>
             <span className="title">{g.title}</span>
-            <span className="src">{g.source === 'provider-docs' ? 'docs' : 'ex'}</span>
+            <span className="src">{g.id === 'telegram' ? 'bot' : g.source === 'provider-docs' ? 'docs' : 'ex'}</span>
           </button>)}
         </div>
       </aside>
@@ -135,12 +137,13 @@ export function InstructionsView({ apiKey, os, setOs, onOpenKeyDialog }) {
           <span className="client-badge" aria-hidden="true">{clientBadge(guide.title)}</span>
           <div>
             <h2>{guide.title}</h2>
-            <p>{activeOs} · {guide.source === 'provider-docs' ? t('instructions.providerDocs') : t('instructions.localExample')}</p>
+            <p>{isTelegram ? t('telegram.platforms') : `${activeOs} · ${guide.source === 'provider-docs' ? t('instructions.providerDocs') : t('instructions.localExample')}`}</p>
           </div>
           <span className="spacer" />
           {guide.status === 'example' && <span className="mono-label" style={{ flex: '0 0 auto' }}>{t('instructions.example')}</span>}
         </header>
 
+          {isTelegram ? <TelegramGuide apiKey={apiKey} /> : <>
           {!apiKey && <PublicConnectionOverview guide={guide} activeOs={activeOs} />}
 
           {apiKey && !content?.supported && <div className="guide-empty">
@@ -177,8 +180,9 @@ export function InstructionsView({ apiKey, os, setOs, onOpenKeyDialog }) {
             <summary>{t('instructions.uninstall')}</summary>
             <pre>{content.example.uninstall}</pre>
           </details>}
-        </>}
+         </>}
+         </>}
       </section>
-    </div>}
+    </div>
   </div>;
 }

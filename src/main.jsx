@@ -10,6 +10,7 @@ import { I18nProvider, useI18n } from './i18n';
 import { loadAccount, useResource, useStoredState } from './hooks';
 import { api } from './api';
 import { PurchaseButton } from './components';
+import { TelegramBanner } from './TelegramBot';
 import './styles.css';
 
 // The key lives in sessionStorage: it survives page reloads but dies with the tab.
@@ -162,6 +163,7 @@ function App() {
       <Topbar page={page} setPage={setPage} apiKey={key} balance={account.data} onOpenKeyDialog={() => setDialogOpen(true)}
         ambientOn={ambientOn === '1'} onToggleAmbient={() => setAmbientOn(ambientOn === '1' ? '0' : '1')} />
       <main>
+        <TelegramBanner apiKey={key} />
         {page === 'balance' && <BalanceView apiKey={key} accountResource={account} onOpenKeyDialog={() => setDialogOpen(true)} onGoInstructions={() => setPage('instructions')} />}
         {page === 'instructions' && <InstructionsView apiKey={key} os={os} setOs={setOs} onOpenKeyDialog={() => setDialogOpen(true)} />}
         {page === 'models' && <ModelsView apiKey={key} onOpenKeyDialog={() => setDialogOpen(true)} />}

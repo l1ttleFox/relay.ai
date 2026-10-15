@@ -450,6 +450,36 @@ button { font-family: inherit; }
 }
 .app-shell.is-ready { opacity: 1; }
 
+.telegram-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+}
+.telegram-banner h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.telegram-banner h2 span { display: inline-block; color: var(--text-3); font: 11px/1.6 var(--mono); }
+.telegram-banner p, .telegram-description {
+  margin: 8px 0 0;
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.telegram-link { text-decoration: none; max-width: 100%; height: auto; min-height: 44px; }
+.telegram-link svg { flex-shrink: 0; }
+.telegram-description { margin: 0 0 24px; }
+.telegram-features {
+  margin: 0 0 28px;
+  padding-left: 20px;
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.telegram-features li + li { margin-top: 8px; }
+.telegram-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+
 /* topbar */
 .topbar {
   position: sticky;
