@@ -1,9 +1,9 @@
 import { modelInfo } from './modelData';
 
 // Multiplier color scale: green (cheap) -> yellow -> red (expensive), log-scaled
-// over the snapshot range (0.05 ... 8).
-const MIN_M = 0.05;
-const MAX_M = 8;
+// over the snapshot range (0.001 ... 12).
+const MIN_M = 0.001;
+const MAX_M = 12;
 
 export function multiplierHue(multiplier) {
   if (multiplier == null) return null;
